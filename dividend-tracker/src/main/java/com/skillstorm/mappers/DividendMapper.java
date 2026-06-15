@@ -2,6 +2,7 @@ package com.skillstorm.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import com.skillstorm.dto.DividendDto;
 import com.skillstorm.models.Dividend;
@@ -26,4 +27,12 @@ public interface DividendMapper {
      * @return DividendDto
      */
     DividendDto toDto(Dividend entity);
+
+    /**
+     * Updates the entity found in the database from the given dto
+     * @param dto dto with fields to update to
+     * @param entity entity to be updated
+     */
+    @Mapping(target = "id", ignore = true)
+    void updateEntityFromDto(DividendDto dto, @MappingTarget Dividend entity);
 }

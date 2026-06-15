@@ -34,14 +34,34 @@ public class DividendService {
         // return ResponseEntity.ok(repo.findAll());
     }
 
+    // getById()
+    public DividendDto getById(Long id) {
+        Dividend d = repo.findById(id).orElseThrow();
+
+        return mapper.toDto(d);
+    }
+
+
     public Iterable<DividendDto> getByTickerSymbol(String ticker) {
         return repo.findByTickerSymbol(ticker).stream().map(mapper::toDto).toList();
         // return ResponseEntity.ok(repo.findByTickerSymbol(ticker));
     }
 
-    public DividendDto createDividend(DividendDto dto) {
+    public DividendDto create(DividendDto dto) {
         Dividend d = mapper.toEntity(dto);
         return mapper.toDto(repo.save(d));
+    }
 
+    public DividendDto update(Long id, DividendDto dto) {
+        Dividend d = repo.findById(id).orElseThrow();
+        mapper.updateEntityFromDto(dto, d);
+
+        Dividend saved = repo.save(d);
+        return mapper.toDto(saved);
+    }
+
+    public void delete(Long id) {
+        Dividend d = repo.findById(id).orElseThrow();
+        repo.delete(d);
     }
 }

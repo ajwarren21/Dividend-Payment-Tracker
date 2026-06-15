@@ -1,34 +1,68 @@
 package com.skillstorm.controllers;
 
+import com.skillstorm.repository.DividendRepository;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
-import com.skillstorm.models.Dividend;
+import com.skillstorm.dto.DividendDto;
+// import com.skillstorm.models.Dividend;
 import com.skillstorm.services.DividendService;
+
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("/dividends")
 public class DividendController {
 
+    // private final DividendRepository dividendRepository;
     private final DividendService service;
 
-    public DividendController(DividendService service) {
+    public DividendController(DividendService service, DividendRepository dividendRepository) {
         this.service = service;
-    }
-
-    // need to change everything here
-    public Iterable<Dividend> getAll() {
-        return service.getAll();
+        // this.dividendRepository = dividendRepository;
     }
 
     @GetMapping
-    public Iterable<Dividend> getByTickerSymbol(@RequestParam String ticker) {
-        return service.getByTickerSymbol(ticker);
+    public ResponseEntity<Iterable<DividendDto>> getAll() {
+        return ResponseEntity.ok(service.getAll());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DividendDto> getById(@RequestParam Long id) {
+        return ResponseEntity.ok(service.getById(id));
+    }
+    
+
+    @GetMapping
+    public ResponseEntity<Iterable<DividendDto>> getByTickerSymbol(@RequestParam String ticker) {
+        return ResponseEntity.ok(service.getByTickerSymbol(ticker));
+    }
+
+    @PostMapping
+    public ResponseEntity<DividendDto> create(@Valid @RequestBody DividendDto dto) {
+        DividendDto created = service.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DividendDto> update(@PathVariable long id, @Valid @RequestBody DividendDto dto) {
+        DividendDto updated = service.update(id, dto);
+        // Could maybe return this another way, test first
+        return ResponseEntity.status(HttpStatus.OK).body(updated);
+    }
+
 
 }
