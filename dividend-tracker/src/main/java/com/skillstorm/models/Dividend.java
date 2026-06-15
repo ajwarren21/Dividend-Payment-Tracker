@@ -50,6 +50,8 @@ public class Dividend {
         this.totalAmount = totalAmount;
     }
 
+    public Dividend() {}
+
     
     public Long getId() {
         return id;
