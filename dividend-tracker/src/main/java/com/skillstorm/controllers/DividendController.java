@@ -1,14 +1,15 @@
 package com.skillstorm.controllers;
 
 import com.skillstorm.repository.DividendRepository;
-import java.util.List;
+// import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+// import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -41,12 +42,12 @@ public class DividendController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DividendDto> getById(@RequestParam Long id) {
+    public ResponseEntity<DividendDto> getById(@PathVariable long id) {
         return ResponseEntity.ok(service.getById(id));
     }
     
 
-    @GetMapping
+    @GetMapping(params = "ticker")
     public ResponseEntity<Iterable<DividendDto>> getByTickerSymbol(@RequestParam String ticker) {
         return ResponseEntity.ok(service.getByTickerSymbol(ticker));
     }
@@ -62,6 +63,12 @@ public class DividendController {
         DividendDto updated = service.update(id, dto);
         // Could maybe return this another way, test first
         return ResponseEntity.status(HttpStatus.OK).body(updated);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable long id) {
+        service.delete(id);
+        return ResponseEntity.ok("Deleted dividend payment");
     }
 
 

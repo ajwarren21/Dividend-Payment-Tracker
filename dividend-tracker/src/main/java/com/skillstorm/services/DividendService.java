@@ -5,11 +5,10 @@ package com.skillstorm.services;
 import org.springframework.stereotype.Service;
 
 import com.skillstorm.dto.DividendDto;
+import com.skillstorm.exceptions.DividendNotFoundException;
 import com.skillstorm.mappers.DividendMapper;
 import com.skillstorm.models.Dividend;
 import com.skillstorm.repository.DividendRepository;
-
-// import io.micrometer.core.ipc.http.HttpSender.Response;
 
 /**
  * Business logic for dividend payments
@@ -36,7 +35,7 @@ public class DividendService {
 
     // getById()
     public DividendDto getById(Long id) {
-        Dividend d = repo.findById(id).orElseThrow();
+        Dividend d = repo.findById(id).orElseThrow(() -> new DividendNotFoundException(id));
 
         return mapper.toDto(d);
     }
@@ -53,7 +52,7 @@ public class DividendService {
     }
 
     public DividendDto update(Long id, DividendDto dto) {
-        Dividend d = repo.findById(id).orElseThrow();
+        Dividend d = repo.findById(id).orElseThrow(() -> new DividendNotFoundException(id));
         mapper.updateEntityFromDto(dto, d);
 
         Dividend saved = repo.save(d);
@@ -61,7 +60,7 @@ public class DividendService {
     }
 
     public void delete(Long id) {
-        Dividend d = repo.findById(id).orElseThrow();
+        Dividend d = repo.findById(id).orElseThrow(() -> new DividendNotFoundException(id));
         repo.delete(d);
     }
 }
