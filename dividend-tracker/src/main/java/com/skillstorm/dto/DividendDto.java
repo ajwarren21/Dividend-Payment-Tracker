@@ -13,7 +13,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 
 
-public record DividendDto(@NotBlank(message = "Security name is required") String securityName,
+public record DividendDto(
+    
+    long id,
+
+    @NotBlank(message = "Security name is required") String securityName,
     
     @NotBlank(message = "Ticker symbol is required") String tickerSymbol,
     
