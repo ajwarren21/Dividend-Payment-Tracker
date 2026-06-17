@@ -11,8 +11,16 @@
     <!-- Including the JS we created -->
     <script src="index.js" defer></script>  <!-- defer will delay DOMContentLoaded until the JS script is processed -->
 
+    <!-- Now include new styling after bootstrap to overrride it -->
+     <link rel="stylesheet" href="styles.css">
+
+     <!-- Include the ticker -->
+      <!-- Not allowed, but cool for later reference -->
+     <!-- <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js"></script> -->
+
 </head>
-<body class="bg-dark">
+<!-- <body class="bg-dark"> -->
+    <body>
 
     <div class="container-fluid">
 
@@ -81,14 +89,15 @@
                         <div class="col-4">
                             <div class="mx-1">
                                 <label for="new-total-amount" class="form-label text-light">Total Amount</label>
-                                <input type="number" step="0.01" min="0.01" class="form-control" id="new-total-amount" name="new-total-amount" placeholder="24.00">
+                                <input type="number" step="0.01" min="0.01" class="form-control" id="new-total-amount" name="new-total-amount" readonly>
+                                <!-- <input type="number" step="0.01" min="0.01" class="form-control" id="new-total-amount" name="new-total-amount" placeholder="24.00"> -->
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col justify-content-right">
-                            <button type="submit" class="btn btn-light mx-1">Submit</button>
+                            <button type="submit" class="btn btn-primary-custom mx-1">Submit</button>
                         </div>
                     </div>
                 </form>
@@ -153,14 +162,14 @@
                         <div class="col-4">
                             <div class="mx-1">
                                 <label for="update-total-amount" class="form-label text-light">Total Amount</label>
-                                <input type="number" step="0.01" min="0.01" class="form-control" id="update-total-amount" name="update-total-amount">
+                                <input type="number" step="0.01" min="0.01" class="form-control" id="update-total-amount" name="update-total-amount" readonly>
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col justify-content-right">
-                            <button type="submit" class="btn btn-light mx-1">Update</button>
+                            <button type="submit" class="btn btn-primary-custom mx-1">Update</button>
                             <button type="button" id="cancel-update-btn" class="btn btn-outline-light mx-1">Cancel</button>
                         </div>
                     </div>
@@ -170,18 +179,21 @@
             <div class="col">
                 <!-- SEARCH BY TICKER -->
                 <div class="row m-3">
-                    <div class="col-lg-6">
+                    <div class="col-lg-9">
                         <form id="search-ticker-form" class="d-flex" action="#">
                             <input type="text" class="form-control me-2" id="search-ticker-input" placeholder="Search by ticker symbol (e.g. AAPL)">
-                            <button type="submit" class="btn btn-light me-2">Search</button>
+                            <button type="submit" class="btn btn-primary-custom me-2">Search</button>
                             <button type="button" id="clear-search-btn" class="btn btn-outline-light">Clear</button>
                         </form>
                     </div>
                 </div>
 
                 <!-- DIVIDEND PAYMENTS TABLE -->
-                <div class="table-responsive m-3">
-                    <table id="dividend-table" class="table table-light table-hover">
+                <!-- <div class="table-responsive m-3"> -->
+                <div class="table-container">
+                    <table id="dividend-table" class="table">
+                    <!-- <table id="dividend-table" class="table table-light table-hover"> -->
+                    
                         <thead>
                             <tr>
                                 <th>Security</th>
@@ -222,6 +234,16 @@
             </div>
         </div>
     </div>
+
+    <!-- Ticker placeholder -->
+    <div id="ticker-bar">
+        <div id="ticker-track"></div>
+    </div>
+
+    <!-- Illegal way of making ticker lol -->
+    <!-- <tv-ticker-tape
+    symbols="NASDAQ:AAPL,NASDAQ:MSFT,NASDAQ:NVDA,NYSE:VZ,NYSE:KO,NYSE:JNJ">
+    </tv-ticker-tape> -->
 
     <!-- Including Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>

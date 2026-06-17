@@ -1,14 +1,22 @@
 const BACKEND_URL = "http://localhost:8080/dividends";
 
 // Keeps track of which record is currently selected for deletion,
-// since the modal confirm button needs to know which id to delete.
+// since the modal confirm button needs to know which id to delete
 let pendingDeleteId = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     loadAllDividends();
 });
 
-// HANDLE NEW DIVIDEND PAYMENTS BEING CREATED WITH THE FORM
+const stocks = [
+    { symbol: "AAPL", price: 213.44, change: 1.2 },
+    { symbol: "MSFT", price: 487.10, change: -0.5 },
+    { symbol: "NVDA", price: 158.22, change: 2.4 },
+    { symbol: "TSLA", price: 302.18, change: -1.1 },
+    { symbol: "SPY", price: 612.88, change: 0.4 }
+];
+
+// HANDLE CREATE
 document.getElementById("new-dividend-form").addEventListener("submit", (eventInfo) => {
     eventInfo.preventDefault();
 
@@ -40,7 +48,7 @@ document.getElementById("new-dividend-form").addEventListener("submit", (eventIn
     });
 });
 
-// HANDLE UPDATES TO AN EXISTING DIVIDEND PAYMENT
+// HANDLE UPDATES 
 document.getElementById("update-dividend-form").addEventListener("submit", (eventInfo) => {
     eventInfo.preventDefault();
 
@@ -127,8 +135,32 @@ document.getElementById("confirm-delete-btn").addEventListener("click", () => {
     });
 });
 
+// HANDLE TOTAL CALCULATION
+document.getElementById("new-amount-per-share").addEventListener("input", () => calculateTotal("new"));
+document.getElementById("new-shares-held").addEventListener("input", () => calculateTotal("new"));
+document.getElementById("update-amount-per-share").addEventListener("input", () => calculateTotal("update"));
+document.getElementById("update-shares-held").addEventListener("input", () => calculateTotal("update"));
 
-///// HELPER FUNCTIONS /////
+
+// for fake tracker
+const tickerTrack = document.getElementById("ticker-track");
+
+tickerTrack.innerHTML = stocks.map(stock => {
+    const arrow = stock.change >= 0 ? "▲" : "▼";
+    const cssClass = stock.change >= 0 ? "up" : "down";
+
+    // Im just returning the html from here and then add placeholder in .html file
+    return `
+        <span class="${cssClass}">
+            ${stock.symbol} ${arrow} $${stock.price} (${stock.change}%)
+        </span>
+    `;
+}).join("");
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//                              HELPER FUNCTIONS
+/////////////////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * Loads every dividend payment from the backend and renders the table.
@@ -173,6 +205,9 @@ const buildDividendDtoFromForm = (prefix) => {
  * @param {Object} dividend - a dividend DTO, expected to include an "id" field
  */
 const addDividendToTable = (dividend) => {
+    // Most of logic from https://github.com/AReeves8/20260427-EY-Java/blob/main/JavaScript/dom/frontend/index.js
+    // Check here for any errors 
+
     const tr = document.createElement("tr");
     tr.setAttribute("id", `TR-${dividend.id}`);
 
@@ -321,7 +356,7 @@ const extractErrorMessage = (body) => {
 /**
  * Shows a dismissible Bootstrap alert at the top of the page.
  * @param {string} message - text to display
- * @param {string} type - bootstrap alert type, e.g. "success" or "danger"
+ * @param {string} type - bootstrap alert type
  */
 const showAlert = (message, type) => {
     const placeholder = document.getElementById("alert-placeholder");
@@ -332,4 +367,23 @@ const showAlert = (message, type) => {
         </div>
     `;
 };
+/**
+ * Calculate the total based on the number and amount per share
+ * @param {string} prefix - either update or new
+ * @returns The new total 
+ */
+const calculateTotal = (prefix) => {
 
+    console.log("GOT INTO CALCULATE WITH " + "prefix")
+
+    const amountPerShare = parseFloat(document.getElementById(`${prefix}-amount-per-share`).value);
+    const sharesHeld = parseInt(document.getElementById(`${prefix}-shares-held`).value, 10);
+
+    if (Number.isNaN(amountPerShare) || Number.isNaN(sharesHeld)) {
+        document.getElementById(`${prefix}-total-amount`).value = "";
+        return;
+    }
+
+    const total = amountPerShare * sharesHeld;
+    document.getElementById(`${prefix}-total-amount`).value = total.toFixed(2);
+};
