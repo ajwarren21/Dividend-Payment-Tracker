@@ -206,6 +206,30 @@ tickerTrack.innerHTML = stocks.map(stock => {
     `;
 }).join("");
 
+
+// sidebar
+const sidebar = document.getElementById("sidebar");
+const toggleBtn = document.getElementById("toggle-sidebar-btn");
+
+toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("d-none");
+});
+
+// const sidebar = document.getElementById("sidebar");
+// const main = document.getElementById("main-content");
+
+// toggleBtn.addEventListener("click", () => {
+//     sidebar.classList.toggle("d-none");
+
+//     if (sidebar.classList.contains("d-none")) {
+//         main.classList.remove("col-lg-8");
+//         main.classList.add("col-lg-10", "mx-auto");
+//     } else {
+//         main.classList.remove("col-lg-10", "mx-auto");
+//         main.classList.add("col-lg-8");
+//     }
+// });
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //                              HELPER FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////
