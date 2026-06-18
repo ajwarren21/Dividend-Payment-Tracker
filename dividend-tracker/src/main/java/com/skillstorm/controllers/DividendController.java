@@ -54,6 +54,16 @@ public class DividendController {
         return ResponseEntity.ok(service.getByTickerSymbol(ticker));
     }
 
+    @GetMapping(params = "type")
+    public ResponseEntity<Iterable<DividendDto>> getByType(@RequestParam String type) {
+        return ResponseEntity.ok(service.getByType(type));
+    }
+
+    @GetMapping(params = "security")
+    public ResponseEntity<Iterable<DividendDto>> getBySecurity(@RequestParam String security) {
+        return ResponseEntity.ok(service.getBySecurity(security));
+    }
+
     @PostMapping
     public ResponseEntity<DividendDto> create(@Valid @RequestBody DividendDto dto) {
         DividendDto created = service.create(dto);

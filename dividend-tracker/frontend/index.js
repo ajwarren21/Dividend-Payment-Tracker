@@ -84,29 +84,77 @@ document.getElementById("cancel-update-btn").addEventListener("click", () => {
     hideUpdateForm();
 });
 
-// HANDLE SEARCHING BY TICKER SYMBOL
-document.getElementById("search-ticker-form").addEventListener("submit", (eventInfo) => {
-    eventInfo.preventDefault();
 
-    const ticker = document.getElementById("search-ticker-input").value.trim();
 
-    if (!ticker) {
+///////////////////////////////////////////////////////////////////////////////
+//                                  FILTERING METHODS
+///////////////////////////////////////////////////////////////////////////////
+
+const searchCategory = document.getElementById("search-category");
+const searchInput = document.getElementById("search-input");
+const typeDropdown = document.getElementById("type-dropdown");
+
+searchCategory.addEventListener("change", () => {
+    const category = searchCategory.value;
+    
+    // swap between the input bar and the dropdown for the type option
+    if (category === "type") {
+        searchInput.classList.add("d-none");
+        typeDropdown.classList.remove("d-none");
+    } else {
+        typeDropdown.classList.add("d-none");
+        searchInput.classList.remove("d-none");
+        
+        if (category === "ticker") {
+            searchInput.placeholder = "Enter ticker symbol";
+        } else {
+            searchInput.placeholder = "Enter security name";
+        }
+    }
+});
+
+document.getElementById("search-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const category = searchCategory.value;
+    let searchValue = "";
+
+    if (category === "type") {
+        searchValue = typeDropdown.value;
+    } else {
+        searchValue = searchInput.value.trim();
+    }
+
+    if (!searchValue) {
         loadAllDividends();
         return;
     }
 
-    fetch(`${BACKEND_URL}?ticker=${encodeURIComponent(ticker)}`)
-        .then((httpResponse) => httpResponse.json())
-        .then((dividends) => renderDividendTable(dividends))
-        .catch((error) => {
+    fetch(`${BACKEND_URL}?${category}=${encodeURIComponent(searchValue)}`)
+        .then(response => response.json())
+        .then(dividends => renderDividendTable(dividends))
+        .catch(error => {
             showAlert("Could not search dividend payments: " + error.message, "danger");
         });
 });
 
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                  END FILTERING
+////////////////////////////////////////////////////////////////////////////////////
+
+
 document.getElementById("clear-search-btn").addEventListener("click", () => {
-    document.getElementById("search-ticker-input").value = "";
+    // This should now also reset the dropdown menu
+    document.getElementById("type-dropdown").value = "";
+
+    document.getElementById("search-form").value = "";
+    document.getElementById("search-input").value = "";
     loadAllDividends();
 });
+
+
 
 // HANDLE DELETE CONFIRMATION
 document.getElementById("confirm-delete-btn").addEventListener("click", () => {
@@ -135,6 +183,7 @@ document.getElementById("confirm-delete-btn").addEventListener("click", () => {
     });
 });
 
+
 // HANDLE TOTAL CALCULATION
 document.getElementById("new-amount-per-share").addEventListener("input", () => calculateTotal("new"));
 document.getElementById("new-shares-held").addEventListener("input", () => calculateTotal("new"));
@@ -142,10 +191,11 @@ document.getElementById("update-amount-per-share").addEventListener("input", () 
 document.getElementById("update-shares-held").addEventListener("input", () => calculateTotal("update"));
 
 
-// for fake tracker
+// for ticker
 const tickerTrack = document.getElementById("ticker-track");
 
 tickerTrack.innerHTML = stocks.map(stock => {
+    // arrow grabbed from unicode: U+25BC (for down)
     const arrow = stock.change >= 0 ? "▲" : "▼";
     const cssClass = stock.change >= 0 ? "up" : "down";
 
@@ -176,7 +226,7 @@ const loadAllDividends = () => {
 
 /**
  * Clears and rebuilds the table body from a list of dividend records.
- * @param {Array} dividends - list of dividend DTOs returned from the backend
+ * @param {Array} dividends list of dividend DTOs returned from the backend
  */
 const renderDividendTable = (dividends) => {
     const tableBody = document.getElementById("dividend-table-body");
@@ -186,7 +236,7 @@ const renderDividendTable = (dividends) => {
 
 /**
  * Builds a DividendDto-shaped object from one of the forms on the page.
- * @param {string} prefix - either "new" or "update", matching the form's input id prefixes
+ * @param {string} prefix either new or update
  */
 const buildDividendDtoFromForm = (prefix) => {
     return {
@@ -202,7 +252,7 @@ const buildDividendDtoFromForm = (prefix) => {
 
 /**
  * Adds a single dividend payment row to the table.
- * @param {Object} dividend - a dividend DTO, expected to include an "id" field
+ * @param {Object} dividend dividendDto
  */
 const addDividendToTable = (dividend) => {
     // Most of logic from https://github.com/AReeves8/20260427-EY-Java/blob/main/JavaScript/dom/frontend/index.js
@@ -309,8 +359,8 @@ const hideUpdateForm = () => {
 };
 
 /**
- * Converts a DividendType enum value into a friendlier display label.
- * @param {string} type - raw enum value, e.g. "RETURN_OF_CAPITAL"
+ * Converts a DividendType enum value into a display label.
+ * @param {string} type raw enum value
  */
 const formatDividendType = (type) => {
     if (!type) {
@@ -324,8 +374,8 @@ const formatDividendType = (type) => {
 };
 
 /**
- * Formats a numeric amount as USD currency for display.
- * @param {number} amount - raw numeric amount
+ * Formats a numeric amount as USD for display.
+ * @param {number} amount raw numeric amount
  */
 const formatCurrency = (amount) => {
     const num = Number(amount);
@@ -336,9 +386,9 @@ const formatCurrency = (amount) => {
 };
 
 /**
- * Pulls a human-readable message out of a Spring error response body.
- * Falls back to a generic message if the shape is unexpected.
- * @param {Object} body - parsed JSON error response
+ * Pulls message out of a Spring error response body.
+ * Falls back to a generic message
+ * @param {Object} body parsed JSON error response
  */
 const extractErrorMessage = (body) => {
     if (!body) {
@@ -354,9 +404,9 @@ const extractErrorMessage = (body) => {
 };
 
 /**
- * Shows a dismissible Bootstrap alert at the top of the page.
- * @param {string} message - text to display
- * @param {string} type - bootstrap alert type
+ * Shows an auto dismissible Bootstrap alert at the top of the page.
+ * @param {string} message text to display
+ * @param {string} type bootstrap alert type
  */
 const showAlert = (message, type) => {
     const placeholder = document.getElementById("alert-placeholder");
@@ -369,7 +419,7 @@ const showAlert = (message, type) => {
 };
 /**
  * Calculate the total based on the number and amount per share
- * @param {string} prefix - either update or new
+ * @param {string} prefix either update or new
  * @returns The new total 
  */
 const calculateTotal = (prefix) => {

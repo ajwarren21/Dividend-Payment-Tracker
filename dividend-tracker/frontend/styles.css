@@ -93,6 +93,7 @@ h1 {
     display: inline-block;
     white-space: nowrap;
     padding-left: 100%;
+    /* could go a little slower, base 25s */
     animation: ticker-scroll 25s linear infinite;
 }
 

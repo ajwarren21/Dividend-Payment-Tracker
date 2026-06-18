@@ -12,11 +12,11 @@
     <script src="index.js" defer></script>  <!-- defer will delay DOMContentLoaded until the JS script is processed -->
 
     <!-- Now include new styling after bootstrap to overrride it -->
-     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">
 
-     <!-- Include the ticker -->
-      <!-- Not allowed, but cool for later reference -->
-     <!-- <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js"></script> -->
+    <!-- Include the ticker -->
+    <!-- Not allowed, but cool for later reference -->
+    <!-- <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js"></script> -->
 
 </head>
 <!-- <body class="bg-dark"> -->
@@ -178,11 +178,47 @@
 
             <div class="col">
                 <!-- SEARCH BY TICKER -->
-                <div class="row m-3">
+                <!-- <div class="row m-3">
                     <div class="col-lg-9">
                         <form id="search-ticker-form" class="d-flex" action="#">
                             <input type="text" class="form-control me-2" id="search-ticker-input" placeholder="Search by ticker symbol (e.g. AAPL)">
                             <button type="submit" class="btn btn-primary-custom me-2">Search</button>
+                            <button type="button" id="clear-search-btn" class="btn btn-outline-light">Clear</button>
+                        </form>
+                    </div>
+                </div> -->
+
+                <!-- New -->
+
+                <div class="row m-3">
+                    <div class="col-lg-10">
+                        <form id="search-form" class="d-flex gap-2">
+
+                            <!-- Search Type Dropdown -->
+                            <select id="search-category" class="form-select" style="max-width: 180px;">
+                                <option value="ticker">Ticker</option>
+                                <option value="security">Security</option>
+                                <option value="type">Dividend Type</option>
+                            </select>
+
+                            <!-- Text Input -->
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="search-input"
+                                placeholder="Enter ticker symbol (e.g. AAPL)"
+                            >
+
+                            <!-- Type Dropdown -->
+                            <select id="type-dropdown" class="form-select d-none">
+                                <option value="">Select Type</option>
+                                <option value="ORDINARY">Ordinary</option>
+                                <option value="QUALIFIED">Qualified</option>
+                                <option value="SPECIAL">Special</option>
+                                <option value="RETURN_OF_CAPITAL">Return of Capital</option>
+                            </select>
+
+                            <button type="submit" class="btn btn-primary-custom">Search</button>
                             <button type="button" id="clear-search-btn" class="btn btn-outline-light">Clear</button>
                         </form>
                     </div>

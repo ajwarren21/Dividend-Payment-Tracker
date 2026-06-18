@@ -1,10 +1,9 @@
 package com.skillstorm.services;
 
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.skillstorm.dto.DividendDto;
+import com.skillstorm.enums.DividendType;
 import com.skillstorm.exceptions.DividendNotFoundException;
 import com.skillstorm.mappers.DividendMapper;
 import com.skillstorm.models.Dividend;
@@ -44,6 +43,15 @@ public class DividendService {
     public Iterable<DividendDto> getByTickerSymbol(String ticker) {
         return repo.findByTickerSymbol(ticker).stream().map(mapper::toDto).toList();
         // return ResponseEntity.ok(repo.findByTickerSymbol(ticker));
+    }
+
+    public Iterable<DividendDto> getBySecurity(String security) {
+        return repo.findBySecurityName(security).stream().map(mapper::toDto).toList();
+    }
+
+    public Iterable<DividendDto> getByType(String type) {
+        DividendType t = DividendType.valueOf(type);
+        return repo.findByDividendType(t).stream().map(mapper::toDto).toList();
     }
 
     public DividendDto create(DividendDto dto) {
