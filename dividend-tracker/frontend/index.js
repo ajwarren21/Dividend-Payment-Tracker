@@ -16,7 +16,7 @@ const stocks = [
     { symbol: "SPY", price: 612.88, change: 0.4 }
 ];
 
-// HANDLE CREATE
+// CREATE
 document.getElementById("new-dividend-form").addEventListener("submit", (eventInfo) => {
     eventInfo.preventDefault();
 
@@ -48,7 +48,7 @@ document.getElementById("new-dividend-form").addEventListener("submit", (eventIn
     });
 });
 
-// HANDLE UPDATES 
+// UPDATE 
 document.getElementById("update-dividend-form").addEventListener("submit", (eventInfo) => {
     eventInfo.preventDefault();
 
@@ -156,7 +156,7 @@ document.getElementById("clear-search-btn").addEventListener("click", () => {
 
 
 
-// HANDLE DELETE CONFIRMATION
+// DELETE CONFIRMATION
 document.getElementById("confirm-delete-btn").addEventListener("click", () => {
     if (pendingDeleteId === null) {
         return;
@@ -184,14 +184,13 @@ document.getElementById("confirm-delete-btn").addEventListener("click", () => {
 });
 
 
-// HANDLE TOTAL CALCULATION
+// TOTAL CALCULATION
 document.getElementById("new-amount-per-share").addEventListener("input", () => calculateTotal("new"));
 document.getElementById("new-shares-held").addEventListener("input", () => calculateTotal("new"));
 document.getElementById("update-amount-per-share").addEventListener("input", () => calculateTotal("update"));
 document.getElementById("update-shares-held").addEventListener("input", () => calculateTotal("update"));
 
 
-// for ticker
 const tickerTrack = document.getElementById("ticker-track");
 
 tickerTrack.innerHTML = stocks.map(stock => {
