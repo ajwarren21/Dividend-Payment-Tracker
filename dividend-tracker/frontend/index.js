@@ -33,8 +33,15 @@ document.getElementById("new-dividend-form").addEventListener("submit", (eventIn
         if (httpResponse.status === 201) {
             return httpResponse.json();
         }
-        // pull the validation/error message out of the response body
-        return httpResponse.json().then((body) => {
+        // pull the validation/error message out of the response 
+        // need to first check if it is just a string in the body, or an errors array
+        return httpResponse.text().then((text) => {
+            let body;
+            try {
+                body = JSON.parse(text);
+            } catch {
+                body = text;
+            }
             throw new Error(extractErrorMessage(body));
         });
     })
@@ -215,20 +222,6 @@ toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("d-none");
 });
 
-// const sidebar = document.getElementById("sidebar");
-// const main = document.getElementById("main-content");
-
-// toggleBtn.addEventListener("click", () => {
-//     sidebar.classList.toggle("d-none");
-
-//     if (sidebar.classList.contains("d-none")) {
-//         main.classList.remove("col-lg-8");
-//         main.classList.add("col-lg-10", "mx-auto");
-//     } else {
-//         main.classList.remove("col-lg-10", "mx-auto");
-//         main.classList.add("col-lg-8");
-//     }
-// });
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //                              HELPER FUNCTIONS
@@ -332,7 +325,7 @@ const addDividendToTable = (dividend) => {
 
 /**
  * Replaces an existing row in the table with updated dividend data.
- * @param {Object} dividend - the updated dividend DTO
+ * @param {Object} dividend the updated dividend DTO
  */
 const replaceDividendInTable = (dividend) => {
     const existingRow = document.getElementById(`TR-${dividend.id}`);
@@ -344,7 +337,7 @@ const replaceDividendInTable = (dividend) => {
 
 /**
  * Removes a row from the table by dividend id.
- * @param {number} id - id of the dividend payment to remove
+ * @param {number} id id of the dividend payment to remove
  */
 const removeDividendFromTable = (id) => {
     const row = document.getElementById(`TR-${id}`);
@@ -355,7 +348,7 @@ const removeDividendFromTable = (id) => {
 
 /**
  * Populates and reveals the update form for the selected dividend record,
- * hiding the new-payment form while it's active.
+ * hiding the new payment form while it's active.
  * @param {Object} dividend - the dividend DTO to edit
  */
 const showUpdateForm = (dividend) => {
@@ -417,12 +410,22 @@ const extractErrorMessage = (body) => {
     if (!body) {
         return "Unknown error";
     }
+
+    // plain string body (e.g. DividendNotFoundException returns ResponseEntity<String>)
+    if (typeof body === "string") {
+        return body;
+    }
+
+    // Spring @Valid failure — field errors are in body.errors as objects with a defaultMessage
+    if (body.errors && Array.isArray(body.errors)) {
+        return body.errors.map(e => e.defaultMessage).join(", ");
+    }
+
+    // fallback to top-level message field
     if (body.message) {
         return body.message;
     }
-    if (body.errors && Array.isArray(body.errors)) {
-        return body.errors.join(", ");
-    }
+
     return "Unknown error";
 };
 
@@ -447,7 +450,7 @@ const showAlert = (message, type) => {
  */
 const calculateTotal = (prefix) => {
 
-    console.log("GOT INTO CALCULATE WITH " + "prefix")
+    // console.log("GOT INTO CALCULATE WITH " + "prefix")
 
     const amountPerShare = parseFloat(document.getElementById(`${prefix}-amount-per-share`).value);
     const sharesHeld = parseInt(document.getElementById(`${prefix}-shares-held`).value, 10);

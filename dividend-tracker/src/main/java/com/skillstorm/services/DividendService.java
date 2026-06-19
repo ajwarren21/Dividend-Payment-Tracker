@@ -29,7 +29,6 @@ public class DividendService {
      */
     public Iterable<DividendDto> getAll() {
         return repo.findAll().stream().map(mapper::toDto).toList();
-        // return ResponseEntity.ok(repo.findAll());
     }
 
     /**
@@ -51,7 +50,6 @@ public class DividendService {
      */
     public Iterable<DividendDto> getByTickerSymbol(String ticker) {
         return repo.findByTickerSymbol(ticker).stream().map(mapper::toDto).toList();
-        // return ResponseEntity.ok(repo.findByTickerSymbol(ticker));
     }
 
     /**

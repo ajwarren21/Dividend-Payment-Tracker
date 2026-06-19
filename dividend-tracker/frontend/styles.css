@@ -82,6 +82,19 @@ h1 {
     font-weight: 700;
 }
 
+.modal-content {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.modal-header {
+    border-bottom-color: var(--border);
+}
+
+.modal-footer {
+    border-top-color: var(--border);
+}
+
 #ticker-bar {
     position: fixed;
     bottom: 0;
