@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadAllDividends();
 });
 
+// hardcoded stocks for ticker, could grab these from an api but too far to stretch for now
 const stocks = [
     { symbol: "AAPL", price: 213.44, change: 1.2 },
     { symbol: "MSFT", price: 487.10, change: -0.5 },
@@ -16,7 +17,7 @@ const stocks = [
     { symbol: "SPY", price: 612.88, change: 0.4 }
 ];
 
-// HANDLE CREATE
+// CREATE
 document.getElementById("new-dividend-form").addEventListener("submit", (eventInfo) => {
     eventInfo.preventDefault();
 
@@ -33,8 +34,15 @@ document.getElementById("new-dividend-form").addEventListener("submit", (eventIn
         if (httpResponse.status === 201) {
             return httpResponse.json();
         }
-        // pull the validation/error message out of the response body
-        return httpResponse.json().then((body) => {
+        // pull the validation/error message out of the response 
+        // need to first check if it is just a string in the body, or an errors array
+        return httpResponse.text().then((text) => {
+            let body;
+            try {
+                body = JSON.parse(text);
+            } catch {
+                body = text;
+            }
             throw new Error(extractErrorMessage(body));
         });
     })
@@ -48,7 +56,7 @@ document.getElementById("new-dividend-form").addEventListener("submit", (eventIn
     });
 });
 
-// HANDLE UPDATES 
+// UPDATE 
 document.getElementById("update-dividend-form").addEventListener("submit", (eventInfo) => {
     eventInfo.preventDefault();
 
@@ -84,31 +92,79 @@ document.getElementById("cancel-update-btn").addEventListener("click", () => {
     hideUpdateForm();
 });
 
-// HANDLE SEARCHING BY TICKER SYMBOL
-document.getElementById("search-ticker-form").addEventListener("submit", (eventInfo) => {
-    eventInfo.preventDefault();
 
-    const ticker = document.getElementById("search-ticker-input").value.trim();
 
-    if (!ticker) {
+///////////////////////////////////////////////////////////////////////////////
+//                                  FILTERING METHODS
+///////////////////////////////////////////////////////////////////////////////
+
+const searchCategory = document.getElementById("search-category");
+const searchInput = document.getElementById("search-input");
+const typeDropdown = document.getElementById("type-dropdown");
+
+searchCategory.addEventListener("change", () => {
+    const category = searchCategory.value;
+    
+    // swap between the input bar and the dropdown for the type option
+    if (category === "type") {
+        searchInput.classList.add("d-none");
+        typeDropdown.classList.remove("d-none");
+    } else {
+        typeDropdown.classList.add("d-none");
+        searchInput.classList.remove("d-none");
+        
+        if (category === "ticker") {
+            searchInput.placeholder = "Enter ticker symbol";
+        } else {
+            searchInput.placeholder = "Enter security name";
+        }
+    }
+});
+
+document.getElementById("search-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const category = searchCategory.value;
+    let searchValue = "";
+
+    if (category === "type") {
+        searchValue = typeDropdown.value;
+    } else {
+        searchValue = searchInput.value.trim();
+    }
+
+    if (!searchValue) {
         loadAllDividends();
         return;
     }
 
-    fetch(`${BACKEND_URL}?ticker=${encodeURIComponent(ticker)}`)
-        .then((httpResponse) => httpResponse.json())
-        .then((dividends) => renderDividendTable(dividends))
-        .catch((error) => {
+    fetch(`${BACKEND_URL}?${category}=${encodeURIComponent(searchValue)}`)
+        .then(response => response.json())
+        .then(dividends => renderDividendTable(dividends))
+        .catch(error => {
             showAlert("Could not search dividend payments: " + error.message, "danger");
         });
 });
 
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                  END FILTERING
+////////////////////////////////////////////////////////////////////////////////////
+
+
 document.getElementById("clear-search-btn").addEventListener("click", () => {
-    document.getElementById("search-ticker-input").value = "";
+    // This should now also reset the dropdown menu
+    document.getElementById("type-dropdown").value = "";
+
+    document.getElementById("search-form").value = "";
+    document.getElementById("search-input").value = "";
     loadAllDividends();
 });
 
-// HANDLE DELETE CONFIRMATION
+
+
+// DELETE CONFIRMATION
 document.getElementById("confirm-delete-btn").addEventListener("click", () => {
     if (pendingDeleteId === null) {
         return;
@@ -135,17 +191,18 @@ document.getElementById("confirm-delete-btn").addEventListener("click", () => {
     });
 });
 
-// HANDLE TOTAL CALCULATION
+
+// TOTAL CALCULATION
 document.getElementById("new-amount-per-share").addEventListener("input", () => calculateTotal("new"));
 document.getElementById("new-shares-held").addEventListener("input", () => calculateTotal("new"));
 document.getElementById("update-amount-per-share").addEventListener("input", () => calculateTotal("update"));
 document.getElementById("update-shares-held").addEventListener("input", () => calculateTotal("update"));
 
 
-// for fake tracker
 const tickerTrack = document.getElementById("ticker-track");
 
 tickerTrack.innerHTML = stocks.map(stock => {
+    // arrow grabbed from unicode: U+25BC (for down)
     const arrow = stock.change >= 0 ? "▲" : "▼";
     const cssClass = stock.change >= 0 ? "up" : "down";
 
@@ -156,6 +213,16 @@ tickerTrack.innerHTML = stocks.map(stock => {
         </span>
     `;
 }).join("");
+
+
+// SIDEBAR
+const sidebar = document.getElementById("sidebar");
+const toggleBtn = document.getElementById("toggle-sidebar-btn");
+
+toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("d-none");
+});
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //                              HELPER FUNCTIONS
@@ -176,7 +243,7 @@ const loadAllDividends = () => {
 
 /**
  * Clears and rebuilds the table body from a list of dividend records.
- * @param {Array} dividends - list of dividend DTOs returned from the backend
+ * @param {Array} dividends list of dividend DTOs returned from the backend
  */
 const renderDividendTable = (dividends) => {
     const tableBody = document.getElementById("dividend-table-body");
@@ -185,8 +252,8 @@ const renderDividendTable = (dividends) => {
 };
 
 /**
- * Builds a DividendDto-shaped object from one of the forms on the page.
- * @param {string} prefix - either "new" or "update", matching the form's input id prefixes
+ * Builds a DividendDto object from one of the forms on the page to be able to pass to backend
+ * @param {string} prefix either new or update
  */
 const buildDividendDtoFromForm = (prefix) => {
     return {
@@ -202,7 +269,7 @@ const buildDividendDtoFromForm = (prefix) => {
 
 /**
  * Adds a single dividend payment row to the table.
- * @param {Object} dividend - a dividend DTO, expected to include an "id" field
+ * @param {Object} dividend dividendDto
  */
 const addDividendToTable = (dividend) => {
     // Most of logic from https://github.com/AReeves8/20260427-EY-Java/blob/main/JavaScript/dom/frontend/index.js
@@ -259,7 +326,7 @@ const addDividendToTable = (dividend) => {
 
 /**
  * Replaces an existing row in the table with updated dividend data.
- * @param {Object} dividend - the updated dividend DTO
+ * @param {Object} dividend the updated dividend DTO
  */
 const replaceDividendInTable = (dividend) => {
     const existingRow = document.getElementById(`TR-${dividend.id}`);
@@ -271,7 +338,7 @@ const replaceDividendInTable = (dividend) => {
 
 /**
  * Removes a row from the table by dividend id.
- * @param {number} id - id of the dividend payment to remove
+ * @param {number} id id of the dividend payment to remove
  */
 const removeDividendFromTable = (id) => {
     const row = document.getElementById(`TR-${id}`);
@@ -282,7 +349,7 @@ const removeDividendFromTable = (id) => {
 
 /**
  * Populates and reveals the update form for the selected dividend record,
- * hiding the new-payment form while it's active.
+ * hiding the new payment form while it's active.
  * @param {Object} dividend - the dividend DTO to edit
  */
 const showUpdateForm = (dividend) => {
@@ -309,8 +376,8 @@ const hideUpdateForm = () => {
 };
 
 /**
- * Converts a DividendType enum value into a friendlier display label.
- * @param {string} type - raw enum value, e.g. "RETURN_OF_CAPITAL"
+ * Converts a DividendType enum value into a display label.
+ * @param {string} type raw enum value
  */
 const formatDividendType = (type) => {
     if (!type) {
@@ -324,8 +391,8 @@ const formatDividendType = (type) => {
 };
 
 /**
- * Formats a numeric amount as USD currency for display.
- * @param {number} amount - raw numeric amount
+ * Formats a numeric amount as USD for display.
+ * @param {number} amount raw numeric amount
  */
 const formatCurrency = (amount) => {
     const num = Number(amount);
@@ -336,27 +403,37 @@ const formatCurrency = (amount) => {
 };
 
 /**
- * Pulls a human-readable message out of a Spring error response body.
- * Falls back to a generic message if the shape is unexpected.
- * @param {Object} body - parsed JSON error response
+ * Pulls message out of a Spring error response body.
+ * Falls back to a generic message
+ * @param {Object} body parsed JSON error response
  */
 const extractErrorMessage = (body) => {
     if (!body) {
         return "Unknown error";
     }
+
+    // plain string body (e.g. DividendNotFoundException returns ResponseEntity<String>)
+    if (typeof body === "string") {
+        return body;
+    }
+
+    // Spring @Valid failure — field errors are in body.errors as objects with a defaultMessage
+    if (body.errors && Array.isArray(body.errors)) {
+        return body.errors.map(e => e.defaultMessage).join(", ");
+    }
+
+    // fallback to top-level message field
     if (body.message) {
         return body.message;
     }
-    if (body.errors && Array.isArray(body.errors)) {
-        return body.errors.join(", ");
-    }
+
     return "Unknown error";
 };
 
 /**
- * Shows a dismissible Bootstrap alert at the top of the page.
- * @param {string} message - text to display
- * @param {string} type - bootstrap alert type
+ * Shows an auto dismissible Bootstrap alert at the top of the page.
+ * @param {string} message text to display
+ * @param {string} type bootstrap alert type
  */
 const showAlert = (message, type) => {
     const placeholder = document.getElementById("alert-placeholder");
@@ -369,12 +446,12 @@ const showAlert = (message, type) => {
 };
 /**
  * Calculate the total based on the number and amount per share
- * @param {string} prefix - either update or new
+ * @param {string} prefix either update or new
  * @returns The new total 
  */
 const calculateTotal = (prefix) => {
 
-    console.log("GOT INTO CALCULATE WITH " + "prefix")
+    // console.log("GOT INTO CALCULATE WITH " + "prefix")
 
     const amountPerShare = parseFloat(document.getElementById(`${prefix}-amount-per-share`).value);
     const sharesHeld = parseInt(document.getElementById(`${prefix}-shares-held`).value, 10);

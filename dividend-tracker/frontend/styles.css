@@ -1,4 +1,6 @@
-:root {
+
+
+ :root {
     /* --bg-primary: #0f172a; */
     --bg-primary:#606884;
     --bg-secondary: #1e293b;
@@ -21,12 +23,19 @@ body {
     padding-bottom: 80px;
 }
 
-form {
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     background: var(--bg-secondary);
     padding: 24px;
     border-radius: 16px;
     border: 1px solid var(--border);
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+form {
+    height: 100%;
 }
 
 .btn-primary-custom {
@@ -73,6 +82,19 @@ h1 {
     font-weight: 700;
 }
 
+.modal-content {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.modal-header {
+    border-bottom-color: var(--border);
+}
+
+.modal-footer {
+    border-top-color: var(--border);
+}
+
 #ticker-bar {
     position: fixed;
     bottom: 0;
@@ -93,6 +115,7 @@ h1 {
     display: inline-block;
     white-space: nowrap;
     padding-left: 100%;
+    /* could go a little slower, base 25s */
     animation: ticker-scroll 25s linear infinite;
 }
 
@@ -123,3 +146,12 @@ h1 {
     }
 }
 
+.sidebar {
+    min-height: 100vh;
+    background: var(--bg-primary);
+    padding: 0;
+}
+
+.main-layout {
+    min-height: 100vh;
+}

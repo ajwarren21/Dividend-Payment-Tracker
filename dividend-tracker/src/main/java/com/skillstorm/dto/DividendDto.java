@@ -12,7 +12,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 
-
+/**
+ * DTO class for the Dividend entity
+ */
 public record DividendDto(
     
     long id,
