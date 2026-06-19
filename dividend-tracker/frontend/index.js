@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadAllDividends();
 });
 
+// hardcoded stocks for ticker, could grab these from an api but too far to stretch for now
 const stocks = [
     { symbol: "AAPL", price: 213.44, change: 1.2 },
     { symbol: "MSFT", price: 487.10, change: -0.5 },
@@ -214,7 +215,7 @@ tickerTrack.innerHTML = stocks.map(stock => {
 }).join("");
 
 
-// sidebar
+// SIDEBAR
 const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggle-sidebar-btn");
 
@@ -251,7 +252,7 @@ const renderDividendTable = (dividends) => {
 };
 
 /**
- * Builds a DividendDto-shaped object from one of the forms on the page.
+ * Builds a DividendDto object from one of the forms on the page to be able to pass to backend
  * @param {string} prefix either new or update
  */
 const buildDividendDtoFromForm = (prefix) => {
