@@ -1,0 +1,25 @@
+spring:
+    
+    application:
+        name: dividend-tracker
+        version: 1.0.0
+    output:
+        ansi:
+            enabled: always
+
+    datasource:
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+    
+    jpa:
+        hibernate:
+            ddl-auto: update
+
+    config:
+        import: "optional:file:.env[.properties]"
+
+
+server:
+    port: 8080
+

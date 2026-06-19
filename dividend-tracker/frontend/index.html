@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dividend Payment Tracker</title>
+
+    <!-- Including Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- Including the JS -->
+    <script src="index.js" defer></script>  <!-- defer will delay DOMContentLoaded until the JS script is processed -->
+
+    <!-- Now include new styling after bootstrap to overrride it -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Include the ticker -->
+    <!-- Not allowed, but cool for later reference -->
+    <!-- <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js"></script> -->
+
+</head>
+<!-- <body class="bg-dark"> -->
+    <body>
+
+    <div class="container-fluid">
+
+        <!-- <h1 style="text-align: center" class="text-light p-3 mb-1">Dividend Payment Tracker</h1>-->
+         <div class="d-flex justify-content-between align-items-center p-3">
+            <h1 class="text-light mb-0">Dividend Payment Tracker</h1>
+
+            <button id="toggle-sidebar-btn" class="btn btn-primary-custom">
+                Add New Dividend Payment
+            </button>
+        </div>
+
+        <!-- Alert placeholder for success / error messages -->
+        <div id="alert-placeholder" class="px-3"></div>
+
+        <div class="row">
+            <div class="col-lg-4 sidebar" id="sidebar">
+                <div class="sidebar-content p-4">
+
+                    <!-- NEW DIVIDEND PAYMENT FORM -->
+                    <form id="new-dividend-form" action="#">
+
+                        <h3 class="h3 p-1 text-light">New Dividend Payment</h3>
+
+                        <div class="row mb-3">
+                            <div class="col-7">
+                                <div class="mx-1">
+                                    <label for="new-security-name" class="form-label text-light">Security Name</label>
+                                    <input type="text" class="form-control" id="new-security-name" name="new-security-name" placeholder="Apple Inc.">
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="mx-1">
+                                    <label for="new-ticker-symbol" class="form-label text-light">Ticker Symbol</label>
+                                    <input type="text" class="form-control" id="new-ticker-symbol" name="new-ticker-symbol" placeholder="AAPL">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-">
+                            <div class="col-6">
+                                <div class="mx-1">
+                                    <label for="new-payment-date" class="form-label text-light">Payment Date</label>
+                                    <input type="date" class="form-control" id="new-payment-date" name="new-payment-date">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mx-1">
+                                    <label for="new-dividend-type" class="form-label text-light">Dividend Type</label>
+                                    <select id="new-dividend-type" class="form-select" name="new-dividend-type" aria-label="Dividend Type Form Select">
+                                        <option selected disabled value="">Select a type</option>
+                                        <option value="ORDINARY">Ordinary</option>
+                                        <option value="QUALIFIED">Qualified</option>
+                                        <option value="SPECIAL">Special</option>
+                                        <option value="RETURN_OF_CAPITAL">Return of Capital</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4">
+                                <div class="mx-1">
+                                    <label for="new-amount-per-share" class="form-label text-light">Amount / Share</label>
+                                    <input type="number" step="0.000001" min="0.000001" class="form-control" id="new-amount-per-share" name="new-amount-per-share" placeholder="0.24">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mx-1">
+                                    <label for="new-shares-held" class="form-label text-light">Shares Held</label>
+                                    <input type="number" step="1" min="1" class="form-control" id="new-shares-held" name="new-shares-held" placeholder="100">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mx-1">
+                                    <label for="new-total-amount" class="form-label text-light">Total Amount</label>
+                                    <input type="number" step="0.01" min="0.01" class="form-control" id="new-total-amount" name="new-total-amount" readonly>
+                                    <!-- <input type="number" step="0.01" min="0.01" class="form-control" id="new-total-amount" name="new-total-amount" placeholder="24.00"> -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col justify-content-right">
+                                <button type="submit" class="btn btn-primary-custom mx-1">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr class="text-light">
+                
+
+                <!-- UPDATE DIVIDEND PAYMENT FORM -->
+                <form id="update-dividend-form" action="#" style="display: none;">
+
+                    <h3 class="h3 p-1 text-light">Update Dividend Payment</h3>
+
+                    <input type="hidden" id="update-dividend-id" name="update-dividend-id">
+
+                    <div class="row mb-3">
+                        <div class="col-7">
+                            <div class="mx-1">
+                                <label for="update-security-name" class="form-label text-light">Security Name</label>
+                                <input type="text" class="form-control" id="update-security-name" name="update-security-name">
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="mx-1">
+                                <label for="update-ticker-symbol" class="form-label text-light">Ticker Symbol</label>
+                                <input type="text" class="form-control" id="update-ticker-symbol" name="update-ticker-symbol">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <div class="mx-1">
+                                <label for="update-payment-date" class="form-label text-light">Payment Date</label>
+                                <input type="date" class="form-control" id="update-payment-date" name="update-payment-date">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mx-1">
+                                <label for="update-dividend-type" class="form-label text-light">Dividend Type</label>
+                                <select id="update-dividend-type" class="form-select" name="update-dividend-type" aria-label="Dividend Type Form Select">
+                                    <option value="ORDINARY">Ordinary</option>
+                                    <option value="QUALIFIED">Qualified</option>
+                                    <option value="SPECIAL">Special</option>
+                                    <option value="RETURN_OF_CAPITAL">Return of Capital</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-4">
+                            <div class="mx-1">
+                                <label for="update-amount-per-share" class="form-label text-light">Amount / Share</label>
+                                <input type="number" step="0.000001" min="0.000001" class="form-control" id="update-amount-per-share" name="update-amount-per-share">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mx-1">
+                                <label for="update-shares-held" class="form-label text-light">Shares Held</label>
+                                <input type="number" step="1" min="1" class="form-control" id="update-shares-held" name="update-shares-held">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mx-1">
+                                <label for="update-total-amount" class="form-label text-light">Total Amount</label>
+                                <input type="number" step="0.01" min="0.01" class="form-control" id="update-total-amount" name="update-total-amount" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col justify-content-right">
+                            <button type="submit" class="btn btn-primary-custom mx-1">Update</button>
+                            <button type="button" id="cancel-update-btn" class="btn btn-outline-light mx-1">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+                </div>
+            </div>
+            <!-- </div> -->
+            <!-- <div class="col-lg-8 main-layout" id="main-content"> -->
+            <div class="col-lg-8 mx-auto main-layout" id="main-content">
+                <!-- col-lg-10", "mx-auto" -->
+
+                <div class="row m-3">
+                    <div class="col-lg-10">
+                        <form id="search-form" class="d-flex gap-2">
+
+                            <!-- Search Type Dropdown -->
+                            <select id="search-category" class="form-select" style="max-width: 180px;">
+                                <option value="ticker">Ticker</option>
+                                <option value="security">Security</option>
+                                <option value="type">Dividend Type</option>
+                            </select>
+
+                            <!-- Text Input -->
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="search-input"
+                                placeholder="Enter ticker symbol (e.g. AAPL)"
+                            >
+
+                            <!-- Type Dropdown -->
+                            <select id="type-dropdown" class="form-select d-none">
+                                <option value="">Select Type</option>
+                                <option value="ORDINARY">Ordinary</option>
+                                <option value="QUALIFIED">Qualified</option>
+                                <option value="SPECIAL">Special</option>
+                                <option value="RETURN_OF_CAPITAL">Return of Capital</option>
+                            </select>
+
+                            <button type="submit" class="btn btn-primary-custom">Search</button>
+                            <button type="button" id="clear-search-btn" class="btn btn-outline-light">Clear</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- DIVIDEND PAYMENTS TABLE -->
+                <!-- <div class="table-responsive m-3"> -->
+                <div class="table-container">
+                    <table id="dividend-table" class="table">
+                    <!-- <table id="dividend-table" class="table table-light table-hover"> -->
+                    
+                        <thead>
+                            <tr>
+                                <th>Security</th>
+                                <th>Ticker</th>
+                                <th>Payment Date</th>
+                                <th>Type</th>
+                                <th>Amount / Share</th>
+                                <th>Shares Held</th>
+                                <th>Total Amount</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dividend-table-body">
+                            <!-- dividend payment rows will be added by the JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div class="modal fade" id="delete-confirm-modal" tabindex="-1" aria-labelledby="delete-confirm-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="delete-confirm-label">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this dividend payment record? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ticker placeholder -->
+    <div id="ticker-bar">
+        <div id="ticker-track"></div>
+    </div>
+
+    <!-- Illegal way of making ticker -->
+    <!-- <tv-ticker-tape
+    symbols="NASDAQ:AAPL,NASDAQ:MSFT,NASDAQ:NVDA,NYSE:VZ,NYSE:KO,NYSE:JNJ">
+    </tv-ticker-tape> -->
+
+    <!-- Including Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>
+

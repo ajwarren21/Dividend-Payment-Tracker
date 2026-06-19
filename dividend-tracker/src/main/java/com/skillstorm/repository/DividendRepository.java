@@ -1,0 +1,24 @@
+package com.skillstorm.repository;
+
+// import org.springframework.stereotype.Repository;
+import com.skillstorm.models.Dividend;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+import com.skillstorm.enums.DividendType;
+
+
+
+/**
+ * Repository for dividend payments
+ */
+public interface DividendRepository extends JpaRepository<Dividend, Long>{
+
+    /** find by ticker */
+    List<Dividend> findByTickerSymbol(String tickerSymbol);
+
+    /** find by security */
+    List<Dividend> findBySecurityName(String securityName);
+
+    /** find by enum type */
+    List<Dividend> findByDividendType(DividendType dividendType);
+}
